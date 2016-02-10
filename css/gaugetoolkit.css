@@ -53,11 +53,6 @@ g.needle {
   filter: url(#GaugeShadow);
 }
 
-.scale {
-  stroke: #ffffff;
-  stroke-linecap: round;
-}
-
 .label {
   font-family: sans-serif;
   font-size: 14;
@@ -80,6 +75,11 @@ g.needle {
 
 .label.small {
   font-size: 12;
+}
+
+.scale {
+  stroke: #ffffff;
+  stroke-linecap: round;
 }
 
 .scale-label {
@@ -133,6 +133,13 @@ path.range {
   -ms-user-select: none;
   user-select: none;
   cursor: default;
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.altimeter .pressure-arrow {
+  stroke: none;
+  fill: #ffffff;
 }
 
 .altimeter .scale-label {

@@ -272,23 +272,48 @@
       var g     = elem('g', { class: 'pressure-dial', id: this.indicatorId }, container);
       var circ  = elem('circle', { cx: 200, cy: 200, r: 161 }, g);
       
-      var tx    = [
-        'matrix(0.9397 0.342 -0.342 0.9397 282.9517 234.1489)',
-        'matrix(0.9848 0.1736 -0.1736 0.9848 287.627 219.2837)',
-        'matrix(1 0 0 1 289.6499 203.833)',
-        'matrix(0.9848 -0.1736 0.1736 0.9848 288.959 188.2651)',
-        'matrix(0.9397 -0.342 0.342 0.9397 280.3481 174.9556)',
-        'matrix(0.866 -0.5 0.5 0.866 274.7842 161.4429)',
-        'matrix(0.766 -0.6428 0.6428 0.766 266.9575 149.1006)',
-        'matrix(0.6428 -0.766 0.766 0.6428 257.1064 138.3047)',
-        'matrix(0.5 -0.866 0.866 0.5 245.5322 129.3848)',
-        'matrix(0.342 -0.9397 0.9397 0.342 232.583 122.6084)',
-        'matrix(0.1736 -0.9848 0.9848 0.1736 218.6543 118.1841)',
-        'matrix(2.980232e-008 -1 1 2.980232e-008 204.168 116.2451)',
-      ];
-      for(var i=980; i<=1035; i+= 5) {
-        elem('text', { class: 'pressure-scale-label', transform: tx[(i - 980) / 5] }, g, i);
+      var o           = { x:constants.cx / 2, y:constants.cy / 2 };
+      var valueStep   = this.pressureDialStep | 5;
+      var valueStart  = this.registers[0].minValue;
+      var valueRange  = this.registers[0].maxValue - this.registers[0].minValue;
+      var angleStart  = -90;
+      var angleRange  = 110;
+      
+      var getPath  = function(radius) {
+        var pt1    = vectorToPoint(o, angleStart, radius);
+        var pt2    = vectorToPoint(o, angleStart + angleRange, radius);
+        return elem('path', { d: 'M' + pt1.x + ',' + pt1.y + 'A' + radius + ',' + radius + ' 0 0,1 ' + pt2.x + ',' + pt2.y });
+      };
+      
+      var getPoint = function(path, value) {
+        return path.getPointAtLength(path.getTotalLength() - (path.getTotalLength() / valueRange) * (i - valueStart));
       }
+      
+      var path1 = getPath(126);
+      var path2 = getPath(114);
+      var path3 = getPath(123);
+      var path4 = getPath(117);
+      var path5 = getPath(110);
+      
+      for(var i = valueStart + valueRange; i >= valueStart; i--) {
+        if(i % valueStep == 0) {
+          var pt1 = getPoint(path1, i);
+          var pt2 = getPoint(path2, i);
+          var pt3 = getPoint(path5, i);
+          var rt  = angleStart + ((angleRange / valueRange) * (valueStart + valueRange - i));
+          elem('line', { x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y, class: 'scale scale-level-1' }, g);
+          elem('text', { x: pt3.x, y: pt3.y, class: 'pressure-scale-label', transform: 'rotate(' + rt + ' ' + pt3.x + ',' + pt3.y + ')' }, g, i);
+        } else {
+          var pt1 = getPoint(path3, i);
+          var pt2 = getPoint(path4, i);
+          elem('line', { x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y, class: 'scale scale-level-2' }, g);
+        }
+      }
+    },
+    renderAltimeterTop : function(container) {
+      $.GT.renderBezel(container);
+      
+      elem('polygon', { points: '327,200 333,194 333,206', class: 'pressure-arrow' }, container);
     },
     renderLabel : function(container) {
       elem('text', { x: this.position.x, y: this.position.y, class: this.class, 'font-family': this.font, 'font-size': this.fontsize, fill: this.color, stroke: this.color, 'stroke-width': this.strokewidth, 'stroke-miterlimit': this.strokemiterlimit  }, container, this.caption);
@@ -457,12 +482,13 @@
     return $.instrument(placeholder, $.extend(true, {
       class: 'altimeter',
       renderFace : null,
+      renderTop  : $.GT.renderAltimeterTop,
       registers: [ 
         { maxValue : 30000, minValue : 0,   setFuncName: 'setAltitude', getFuncName: 'getAltitude' },
         { maxValue : 1040,  minValue : 975, setFuncName: 'setPressure', getFuncName: 'getPressure' } ],
       gauges : [ 
-        { registers: [1], startAngle : -27.692, renderIndicator: $.GT.renderPressureDial
-        },
+        { registers: [1], startAngle : -20, degreeRange: 110,  renderIndicator: $.GT.renderPressureDial
+        }, 
         { registers: [0], startAngle : 90, degreeRange: 360, modulo: 10000, renderBase: $.GT.renderAltimeterFace, renderIndicator: $.GT.renderSmallNeedle, mechanics: $.GT.clockGaugeMechanics,
           labels: [ 
             { class: 'label large', caption: 'ALT', position: {x:200, y:155} },
