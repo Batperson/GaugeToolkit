@@ -25,13 +25,17 @@ https://github.com/sebmatton/jQuery-Flight-Indicators
     <h1><center>jQuery Flight Gauge Toolkit</center></h1>
     
     <div class="examples">
-        <div>
-            <span id="generic"></span>     
-        </div>
+        
         <div>
             <span id="airspeed"></span>     
             <span id="altimeter"></span>     
-            <span id="variometer"></span>     
+        </div>
+        <div>
+            <span id="heading"></span>
+            <span id="variometer"></span>   
+        </div>
+        <div>
+            <span id="generic"></span>     
         </div>
     </div>
 
@@ -62,6 +66,7 @@ var generic = $.instrument('#generic', {
 var airspeed     = $.airspeed('#airspeed', { size: 200 }); 
 var altimeter    = $.altimeter('#altimeter', { size: 200 });
 var variometer   = $.variometer('#variometer', { size: 200 });
+var heading      = $.heading('#heading', { size: 200 });
 
 // Update at 20Hz
 var increment = 0;
@@ -70,7 +75,8 @@ setInterval(function() {
     airspeed.setAirspeed(80+80*Math.sin(increment/10));
     altimeter.setAltitude((10*increment) % 30000);
     altimeter.setPressure(1000+3*Math.sin(increment/50));
-    variometer.setVario(2*Math.sin(increment/10));
+    variometer.setVario(1.9*Math.sin(increment/10));
+    heading.setHeading(increment);
     
     increment++;
 }, 50);

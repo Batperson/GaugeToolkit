@@ -16,11 +16,13 @@
     if(settings.registers) {
       settings.registers.forEach(function(register,i,a) {
         register = settings.registers[i] = $.extend({
-          setFuncName : 'setValue',
-          getFuncName : 'getValue',
-          value       : 0, 
-          minValue    : 0, 
-          maxValue    : 100
+          setFuncName      : 'setValue',
+          getFuncName      : 'getValue',
+          value            : 0, 
+          minValue         : 0, 
+          maxValue         : 100,
+          inputConversion  : function(val) { return val; },
+          outputConversion : function(val) { return val; }
         }, register);
         
         register.parent      = settings;
@@ -31,7 +33,7 @@
     if(settings.gauges) {
       settings.gauges.forEach(function(gauge,i) {
         gauge = settings.gauges[i] = $.extend(true, {
-          id              : 'gauge' + i,
+          clockwise       : true,
           classname       : 'gauge',
           renderBase      : null, 
           renderIndicator : $.GT.renderNeedle, 
@@ -75,7 +77,6 @@
                 if(scale.label) {
                   scale.label = $.extend({
                     class            : 'label scale-label',
-                    interval         : 1,
                     offset           : -44,
                     formatFunction   : function(val) { return val; },
                     render           : $.GT.renderLabel,
@@ -110,10 +111,11 @@
       };
       
       register.getValue = function() {
-        return this.value;
+        return this.outputConversion(this.value);
       };
       
       register.setValue = function(val) {
+        val = this.inputConversion(val);
         if(val < this.minValue)
           val = this.minValue;
         else if(val > this.maxValue)
@@ -177,7 +179,7 @@
       if(gauge.renderIndicator) 
         gauge.renderIndicator(g);
       if(gauge.renderTop)
-        gauge.renderTop(svg);
+        gauge.renderTop(g);
       
       var transform = '';
       if(gauge.scale && gauge.scale != 1) {
@@ -257,6 +259,70 @@
       var g     = elem('g', { class: 'needle needle-small-reverse', id: this.indicatorId }, container);
       var poly  = elem('polygon', { class: 'needle', points: '59.719,196.417 68.082,200 59.719,203.583 52.719,203.583 52.719,196.417' }, g);
     },
+    renderCompassRose : function(container) {
+      var g  = elem('g', { id:this.indicatorId }, container);
+      
+      var p1 = elem('path', { d: 'M50,200A150,150 0 0,1 350,200A150,150 0 1,1 50,200' });
+      var p2 = elem('path', { d: 'M65,200A120,120 0 0,1 335,200A120,120 0 1,1 65,200' });
+      var p3 = elem('path', { d: 'M70,200A110,110 0 0,1 330,200A110,110 0 1,1 70,200' });
+      var p4 = elem('path', { d: 'M90,200A90,90 0 0,1 310,200A90,90 0 1,1 90,200' });
+      
+      var f1 = p1.getTotalLength() / 360;
+      var f2 = p2.getTotalLength() / 360;
+      var f3 = p3.getTotalLength() / 360;
+      var f4 = p4.getTotalLength() / 360;
+      
+      for(var i=0;i<360;i+=5) {
+        var pt1 = p1.getPointAtLength(f1 * i);
+        var pt2 = (i % 10 == 0) ? p3.getPointAtLength(f3 * i) : p2.getPointAtLength(f2 * i);
+        elem('line', { class: 'heading-lines', x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y }, g);
+        
+        if(i % 30 == 0) {
+          var k = ((i + 270) % 360);
+          var l = '';
+          switch(i) {
+            case 0:
+              l = 'W';
+              break;
+            case 90:
+              l = 'N';
+              break;
+            case 180:
+              l = 'E';
+              break;
+            case 270:
+              l = 'S';
+              break;
+            default:
+              l = k / 10;
+          }
+          
+          var pt = p4.getPointAtLength(f4 * i);
+          elem('text', { class: 'label heading-degrees', x: pt.x, y: pt.y, transform: 'rotate(' + k + ' ' + pt.x + ',' + pt.y + ')' }, g, l);
+        }
+      }
+    },
+    renderHeadingMarkings : function(container) {
+      var g = elem('g', { class: 'heading-markings' }, container);
+      elem('path', { class: 'heading-aircraft', d: 'M200.38,81.417c0,0-7.042,11.625-11.292,24.75s-7.125,51.375-7.125,51.375l-54.213,39.3c0,0-13.543,8.502-16.3,15.598c-0.958,2.468-1.491,5.852-1.612,7.852c-0.222,3.681,0,13.749,0,13.75c0.125,2.125,1.5,3.875,6,2.375s69.5-23.125,69.5-23.125l2.75,54.25c0,0-16.723,12.949-21.875,17.75c-1.232,1.148-3.054,2.765-4.063,4.875c-1.045,2.187-1.161,5.537-1.188,7.25c-0.038,2.437-0.131,8.147,0.188,9.063c0.5,1.438,1.063,1.918,3.135,1.918c2.625,0,12.928-5.73,12.928-5.73l18.75-9.25l4.333,12.25l-4.333-12.25l4.333,12.25h0.168l4.333-12.25l18.75,9.25c0,0,10.303,5.73,12.928,5.73c2.072,0,2.635-0.48,3.135-1.918c0.318-0.916,0.226-6.625,0.188-9.063c-0.027-1.713-0.143-5.063-1.188-7.25c-1.008-2.11-2.83-3.727-4.063-4.875c-5.152-4.801-21.875-17.75-21.875-17.75l2.75-54.25c0,0,65,21.625,69.5,23.125s5.875-0.25,6-2.375c0-0.001,0.222-10.069,0-13.75c-0.121-2-0.653-5.384-1.612-7.852c-2.756-7.096-16.3-15.598-16.3-15.598l-54.213-39.3c0,0-2.875-38.25-7.125-51.375S200.38,81.417,200.38,81.417V61' }, g);
+      elem('polygon', { class: 'heading-arrows-cardinal', points: '200.381,332.311 194.542,344.439 206.542,344.439' }, g);
+      elem('polygon', { class: 'heading-arrows-cardinal', points: '68.291,200.382 56.291,194.604 56.291,206.477' }, g);
+      elem('polygon', { class: 'heading-arrows-cardinal', points: '332.311,200.285 344.44,206.125 344.441,194.125' }, g);
+      elem('polygon', { class: 'heading-arrows-cardinal', points: '200.619,68.022 206.458,55.893 194.458,55.892' }, g);
+      elem('polygon', { class: 'heading-arrows-secondary', points: '294.272,294.239 298.743,307.01 307.272,298.481' }, g);
+      elem('polygon', { class: 'heading-arrows-secondary', points: '105.938,294.771 94.146,298.898 102.02,306.771' }, g);
+      elem('polygon', { class: 'heading-arrows-secondary', points: '106.001,106.041 101.801,94.041 93.787,102.055' }, g);
+      elem('polygon', { class: 'heading-arrows-secondary', points: '294.731,105.894 306.519,101.767 298.646,93.894' }, g);
+    },
+    renderVarioFace : function(container) {
+      elem('path', { class: 'scale scale-level-1', d: 'M337.011,178.353c0,0,3,8.314,3,21.98c0,13.167-3,21.315-3,21.315' }, container);
+      elem('path', { class: 'scale scale-level-1', d: 'M121.417,181.292h-36.25c0,0,0.342-4.491,2.306-11.307c1.694-5.881,3.944-10.068,3.944-10.068' }, container);
+      elem('path', { class: 'scale scale-level-1', d: 'M121.417,218.708h-36.25c0,0,0.342,4.491,2.306,11.307c1.694,5.881,3.944,10.068,3.944,10.068' }, container);
+      elem('polygon', { class: 'scale scale-glyph', points: '92.042,158.554 88.167,160.792 92.813,162.73' }, container);
+      elem('polygon', { class: 'scale scale-glyph', points: '92.042,241.446 88.167,239.208 92.813,237.27' }, container);
+      elem('text', { class: 'label tiny left', x: 125, y: 184 }, container, 'UP');
+      elem('text', { class: 'label tiny left', x: 125, y: 222 }, container, 'DOWN');
+    },
     renderAltimeterFace : function(container) {
       var path = elem('path', { class: 'instrument-face', d: 'M200.333,47c-84.497,0-153,68.503-153,153s68.503,153,153,153 s153-68.503,153-153S284.831,47,200.333,47zM275.85,221.422c1.929-6.813,2.984-13.992,2.984-21.422c0-7.397-1.045-14.546-2.958-21.332l49.113-13.869c3.155,11.193,4.846,23,4.846,35.201c0,12.256-1.704,24.114-4.886,35.351L275.85,221.422z' }, container);
       [ 'M154.451,277.04c6.239,3.724,12.973,6.701,20.072,8.833l-18.447-11.562L154.451,277.04z',
@@ -267,6 +333,8 @@
       ].forEach(function(d) {
         elem('path', { class: 'altimeter-stripes', d: d}, container);
       });
+      elem('text', { class: 'label scale-label', x: 300, y: 157 }, container, '2');
+      elem('text', { class: 'label scale-label', x: 300, y: 250 }, container, '3');
     },
     renderPressureDial : function(container) {
       var g     = elem('g', { class: 'pressure-dial', id: this.indicatorId }, container);
@@ -302,7 +370,7 @@
           var pt3 = getPoint(path5, i);
           var rt  = angleStart + ((angleRange / valueRange) * (valueStart + valueRange - i));
           elem('line', { x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y, class: 'scale scale-level-1' }, g);
-          elem('text', { x: pt3.x, y: pt3.y, class: 'pressure-scale-label', transform: 'rotate(' + rt + ' ' + pt3.x + ',' + pt3.y + ')' }, g, i);
+          elem('text', { x: pt3.x, y: pt3.y, class: 'label pressure-scale-label', transform: 'rotate(' + rt + ' ' + pt3.x + ',' + pt3.y + ')' }, g, i);
         } else {
           var pt1 = getPoint(path3, i);
           var pt2 = getPoint(path4, i);
@@ -313,7 +381,7 @@
     renderAltimeterTop : function(container) {
       $.GT.renderBezel(container);
       
-      elem('polygon', { points: '327,200 333,194 333,206', class: 'pressure-arrow' }, container);
+      elem('polygon', { points: '327,200 333,194 333,206', class: 'scale-glyph' }, container);
     },
     renderLabel : function(container) {
       elem('text', { x: this.position.x, y: this.position.y, class: this.class, 'font-family': this.font, 'font-size': this.fontsize, fill: this.color, stroke: this.color, 'stroke-width': this.strokewidth, 'stroke-miterlimit': this.strokemiterlimit  }, container, this.caption);
@@ -417,14 +485,12 @@
             var label = scale.label;
             if(label) {
               if(!label.skip || label.skip.every(_skipFunc)) {
-                if(scale.curinterval++ % label.interval == 0) {
-                  label.parent   = scale;
-                  label.caption  = label.formatFunction(val);
-                  label.position = label.rp.getPointAtLength((label.rp.getTotalLength() / tcount) * i); 
-                  
-                  if(label.render)
-                    label.render(container);
-                }
+                label.parent   = scale;
+                label.caption  = label.formatFunction(val);
+                label.position = label.rp.getPointAtLength((label.rp.getTotalLength() / tcount) * i); 
+                
+                if(label.render)
+                  label.render(container);
               }
             }
           }
@@ -436,9 +502,10 @@
       if(settings.registers && settings.registers.length && indicatorElem) {
         var register        = settings.registers[0];
         var degreeStart     = settings.startAngle;
+        var f               = (settings.clockwise) ? 1 : -1;
       
         register.addListener(function(val) {
-          var degrees = degreeStart + (val - register.minValue) * settings.degreesPerValue;
+          var degrees = degreeStart + (val - register.minValue) * settings.degreesPerValue * f;
           indicatorElem.setAttribute('transform', 'rotate(' + degrees + ' 200 200)');
         });
       }
@@ -448,9 +515,10 @@
       if(settings.registers && settings.registers.length && indicatorElem) { 
         var register        = settings.registers[0];
         var degreeStart     = settings.startAngle;
+        var f               = (settings.clockwise) ? 1 : -1;
         
         register.addListener(function(val) {
-          var degrees = degreeStart + (val % settings.modulo) * settings.degreesPerValue;
+          var degrees = degreeStart + (val % settings.modulo) * settings.degreesPerValue * f;
           indicatorElem.setAttribute('transform', 'rotate(' + degrees + ' 200 200)');
         });
       }
@@ -459,6 +527,31 @@
       
     },
   };
+  
+  $.heading = function(placeholder, options) {
+    return $.instrument(placeholder, $.extend(true, { 
+      class: 'heading',
+      registers: [ { 
+        maxValue : 360, 
+        minValue : 0, 
+        setFuncName: 'setHeading', 
+        getFuncName: 'getHeading',
+        inputConversion: function(val) {
+          val = val % 360;
+          if(val < 0)
+            val = 360 + val;
+          return val;
+        }
+      } ],
+      gauges : [ { 
+        degreeRange: 360,
+        startAngle: 0,
+        clockwise: false,
+        renderIndicator: $.GT.renderCompassRose,
+        renderTop: $.GT.renderHeadingMarkings
+      } ]
+    }, options));
+  }
   
   $.airspeed = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, { 
