@@ -33,6 +33,7 @@
     if(settings.gauges) {
       settings.gauges.forEach(function(gauge,i) {
         gauge = settings.gauges[i] = $.extend(true, {
+          visible         : true,
           clockwise       : true,
           classname       : 'gauge',
           renderBase      : null, 
@@ -170,6 +171,8 @@
       var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
       g.setAttribute("class", gauge.classname);
       
+      if(gauge.visible == false)
+        g.setAttribute('display', 'none');
       if(gauge.renderBase)
         gauge.renderBase(g);
       
@@ -275,7 +278,7 @@
       for(var i=0;i<360;i+=5) {
         var pt1 = p1.getPointAtLength(f1 * i);
         var pt2 = (i % 10 == 0) ? p3.getPointAtLength(f3 * i) : p2.getPointAtLength(f2 * i);
-        elem('line', { class: 'heading-lines', x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y }, g);
+        var e   = elem('line', { class: 'heading-lines', x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y }, g);
         
         if(i % 30 == 0) {
           var k = ((i + 270) % 360);
@@ -286,6 +289,7 @@
               break;
             case 90:
               l = 'N';
+              e.setAttribute('class', 'heading-lines heading-lines-n');
               break;
             case 180:
               l = 'E';
@@ -313,6 +317,14 @@
       elem('polygon', { class: 'heading-arrows-secondary', points: '105.938,294.771 94.146,298.898 102.02,306.771' }, g);
       elem('polygon', { class: 'heading-arrows-secondary', points: '106.001,106.041 101.801,94.041 93.787,102.055' }, g);
       elem('polygon', { class: 'heading-arrows-secondary', points: '294.731,105.894 306.519,101.767 298.646,93.894' }, g);
+    },
+    renderBeaconOne : function(container) {
+      var g = elem('g', { id: this.indicatorId, class: 'heading-beacon-one' }, container);
+      elem('path', { d: 'm 198,200 0,-110 -4,0 6.5,-20 6,20 -4,0 0,240 -4.5,0 z ' }, g);
+    },
+    renderBeaconTwo : function(container) {
+      var g = elem('g', { id: this.indicatorId, class: 'heading-beacon-two' }, container);
+      elem('path', { d: 'm 198,200 0,-110 -4,0 6.5,-20 6,20 -4,0 0,240 -4.5,0 z ' }, g);
     },
     renderVarioFace : function(container) {
       elem('path', { class: 'scale scale-level-1', d: 'M337.011,178.353c0,0,3,8.314,3,21.98c0,13.167-3,21.315-3,21.315' }, container);
@@ -531,6 +543,7 @@
   $.heading = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, { 
       class: 'heading',
+      renderTop: $.GT.renderHeadingMarkings,
       registers: [ { 
         maxValue : 360, 
         minValue : 0, 
@@ -542,13 +555,53 @@
             val = 360 + val;
           return val;
         }
+      }, 
+      { 
+        maxValue : 360, 
+        minValue : 0, 
+        setFuncName: 'setBeacon1', 
+        getFuncName: 'getBeacon1',
+        inputConversion: function(val) {
+          val = val % 360;
+          if(val < 0)
+            val = 360 + val;
+          return val;
+        }
+      }, 
+      { 
+        maxValue : 360, 
+        minValue : 0, 
+        setFuncName: 'setBeacon2', 
+        getFuncName: 'getBeacon2',
+        inputConversion: function(val) {
+          val = val % 360;
+          if(val < 0)
+            val = 360 + val;
+          return val;
+        }
       } ],
       gauges : [ { 
+        registers: [0],
         degreeRange: 360,
         startAngle: 0,
         clockwise: false,
-        renderIndicator: $.GT.renderCompassRose,
-        renderTop: $.GT.renderHeadingMarkings
+        renderIndicator: $.GT.renderCompassRose
+      }, 
+      {
+        registers: [1],
+        degreeRange: 360,
+        startAngle: 0,
+        clockwise: true,
+        visible: options.beacon1Visible || false,
+        renderIndicator: $.GT.renderBeaconOne
+      }, 
+      {
+        registers: [2],
+        degreeRange: 360,
+        startAngle: 0,
+        clockwise: true,
+        visible: options.beacon2Visible || false,
+        renderIndicator: $.GT.renderBeaconTwo
       } ]
     }, options));
   }

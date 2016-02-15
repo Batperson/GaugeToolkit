@@ -154,6 +154,22 @@ g.heading-markings {
   filter: url(#GaugeShadow);
 }
 
+g.heading-beacon-one {
+  filter: url(#GaugeShadow);
+}
+
+g.heading-beacon-one path {
+  fill: #ffff00;
+}
+
+g.heading-beacon-one path {
+  fill: #ffff00;
+}
+
+g.heading-beacon-two path {
+  fill: #00d400;
+}
+
 text.heading-degrees {
   font-weight: normal;
   font-size: 28;
@@ -163,6 +179,10 @@ line.heading-lines {
   stroke: #ffffff;
   stroke-linecap: round;
   stroke-width: 2;
+}
+
+line.heading-lines-n {
+  stroke: #ff0000;
 }
 
 path.heading-aircraft {

@@ -66,7 +66,7 @@ var generic = $.instrument('#generic', {
 var airspeed     = $.airspeed('#airspeed', { size: 200 }); 
 var altimeter    = $.altimeter('#altimeter', { size: 200 });
 var variometer   = $.variometer('#variometer', { size: 200 });
-var heading      = $.heading('#heading', { size: 200 });
+var heading      = $.heading('#heading', { size: 200, beacon1Visible: true, beacon2Visible: true });
 
 // Update at 20Hz
 var increment = 0;
@@ -77,6 +77,8 @@ setInterval(function() {
     altimeter.setPressure(1000+3*Math.sin(increment/50));
     variometer.setVario(1.9*Math.sin(increment/10));
     heading.setHeading(increment);
+    heading.setBeacon1(increment);
+    heading.setBeacon2(-increment);
     
     increment++;
 }, 50);
