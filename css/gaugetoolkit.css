@@ -158,16 +158,21 @@ g.heading-beacon-one {
   filter: url(#GaugeShadow);
 }
 
-g.heading-beacon-one path {
+.heading-beacon-one-marker {
   fill: #ffff00;
+  stroke: none;
 }
 
-g.heading-beacon-one path {
-  fill: #ffff00;
+g.heading-beacon-two {
+  filter: url(#GaugeShadow);
 }
 
-g.heading-beacon-two path {
-  fill: #00d400;
+.heading-beacon-two-marker {
+  fill: none;
+  stroke: #00d400;
+  stroke-width: 4;
+  stroke-linecap: butt;
+  stroke-miterlimit: 10;
 }
 
 text.heading-degrees {

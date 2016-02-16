@@ -36,10 +36,11 @@
           visible         : true,
           clockwise       : true,
           classname       : 'gauge',
-          renderBase      : null, 
+          renderBase      : undefined, 
           renderIndicator : $.GT.renderNeedle, 
-          renderTop       : null,
-          degreeRange     : 120,
+          renderTop       : undefined,
+          movementStart   : undefined,
+          movementRange   : 120,
           scale           : 1,
           offset          : { x:0, y:0 },
           rotate          : 0,
@@ -47,7 +48,8 @@
           labels          : [],
           scales           : [],
           registers       : [0],
-          mechanics       : $.GT.radialGaugeMechanics
+          mechanics       : $.GT.radialGaugeMechanics,
+          showFuncName    : undefined,
         }, gauge);
         
         gauge.parent     = settings;
@@ -158,10 +160,12 @@
     settings.gauges.forEach(function(gauge) {
       gauge.registers   = registers.filter(function(v,i,a) { return gauge.registers.some(function(r) { return (r == i || r == v.name) }) });
       gauge.indicatorId = 'indicator-id-' + Date.now();
-      if(!gauge.startAngle && gauge.startAngle != 0) gauge.startAngle = 90 - (gauge.degreeRange / 2);
+      if(gauge.movementStart === undefined) gauge.movementStart = 90 - (gauge.movementRange / 2);
       if(gauge.registers) gauge.degreesPerValue = (gauge.modulo) ? 
-        gauge.degreeRange / gauge.modulo : 
-        gauge.degreeRange / (gauge.registers[0].maxValue - gauge.registers[0].minValue);
+        gauge.movementRange / gauge.modulo : 
+        gauge.movementRange / (gauge.registers[0].maxValue - gauge.registers[0].minValue);
+      if(gauge.showFuncName) 
+        instrumentObject[gauge.showFuncName] = function(show) { if(show === false) g.setAttribute('display', 'none'); else g.removeAttribute('display'); };
       
       gauge.ranges.forEach(function(range) { 
         if(range.fromValue === undefined) range.fromValue = gauge.registers[0].minValue;
@@ -320,11 +324,13 @@
     },
     renderBeaconOne : function(container) {
       var g = elem('g', { id: this.indicatorId, class: 'heading-beacon-one' }, container);
-      elem('path', { d: 'm 198,200 0,-110 -4,0 6.5,-20 6,20 -4,0 0,240 -4.5,0 z ' }, g);
+      elem('path', { class: 'heading-beacon-one-marker', d: 'm 198,200 0,-110 -4,0 6.5,-18 6,18 -4,0 0,238 -4.5,0 z' }, g);
     },
     renderBeaconTwo : function(container) {
       var g = elem('g', { id: this.indicatorId, class: 'heading-beacon-two' }, container);
-      elem('path', { d: 'm 198,200 0,-110 -4,0 6.5,-20 6,20 -4,0 0,240 -4.5,0 z ' }, g);
+      elem('rect', { class: 'heading-beacon-two-marker', x: 195, y: 120, width: 10, height: 150 }, g);
+      elem('polygon', { class: 'heading-beacon-two-marker', points: '190,120 200,80 210,120' }, g);
+      elem('line', { class: 'heading-beacon-two-marker', x1: 200, y1: 270, x2: 200, y2: 325 }, g);
     },
     renderVarioFace : function(container) {
       elem('path', { class: 'scale scale-level-1', d: 'M337.011,178.353c0,0,3,8.314,3,21.98c0,13.167-3,21.315-3,21.315' }, container);
@@ -417,7 +423,7 @@
       };
       
       var register    = this.parent.registers[0];
-      var degreeStart = this.parent.startAngle;
+      var degreeStart = this.parent.movementStart;
       
       var angleStart  = -180 + degreeStart + (this.fromValue - register.minValue) * this.parent.degreesPerValue;
       var angleEnd    = angleStart + ((this.toValue - this.fromValue) * this.parent.degreesPerValue); 
@@ -513,7 +519,7 @@
       var indicatorElem = container.querySelector('#' + settings.indicatorId);
       if(settings.registers && settings.registers.length && indicatorElem) {
         var register        = settings.registers[0];
-        var degreeStart     = settings.startAngle;
+        var degreeStart     = settings.movementStart;
         var f               = (settings.clockwise) ? 1 : -1;
       
         register.addListener(function(val) {
@@ -526,7 +532,7 @@
       var indicatorElem = container.querySelector('#' + settings.indicatorId);
       if(settings.registers && settings.registers.length && indicatorElem) { 
         var register        = settings.registers[0];
-        var degreeStart     = settings.startAngle;
+        var degreeStart     = settings.movementStart;
         var f               = (settings.clockwise) ? 1 : -1;
         
         register.addListener(function(val) {
@@ -582,25 +588,27 @@
       } ],
       gauges : [ { 
         registers: [0],
-        degreeRange: 360,
-        startAngle: 0,
+        movementRange: 360,
+        movementStart: 0,
         clockwise: false,
         renderIndicator: $.GT.renderCompassRose
       }, 
       {
         registers: [1],
-        degreeRange: 360,
-        startAngle: 0,
+        movementRange: 360,
+        movementStart: 0,
         clockwise: true,
         visible: options.beacon1Visible || false,
+        showFuncName: 'showBeacon1',
         renderIndicator: $.GT.renderBeaconOne
       }, 
       {
         registers: [2],
-        degreeRange: 360,
-        startAngle: 0,
+        movementRange: 360,
+        movementStart: 0,
         clockwise: true,
         visible: options.beacon2Visible || false,
+        showFuncName: 'showBeacon1',
         renderIndicator: $.GT.renderBeaconTwo
       } ]
     }, options));
@@ -611,8 +619,8 @@
       class: 'airspeed',
       registers: [ { maxValue : 160, minValue : 0, setFuncName: 'setAirspeed', getFuncName: 'getAirspeed' } ],
       gauges : [ { 
-        degreeRange: 320,
-        startAngle: 90,
+        movementRange: 320,
+        movementStart: 90,
         labels: [ { caption: 'AIR SPEED', position: {x:200, y:160} }, { caption: 'KNOTS', position: {x:200, y:240} } ],
         ranges: [ 
           { offset: 150, extent: -10, fromValue:30, toValue:100,  color:'#007511' }, 
@@ -633,9 +641,9 @@
         { maxValue : 30000, minValue : 0,   setFuncName: 'setAltitude', getFuncName: 'getAltitude' },
         { maxValue : 1040,  minValue : 975, setFuncName: 'setPressure', getFuncName: 'getPressure' } ],
       gauges : [ 
-        { registers: [1], startAngle : -20, degreeRange: 110,  renderIndicator: $.GT.renderPressureDial
+        { registers: [1], movementStart : -20, movementRange: 110,  renderIndicator: $.GT.renderPressureDial
         }, 
-        { registers: [0], startAngle : 90, degreeRange: 360, modulo: 10000, renderBase: $.GT.renderAltimeterFace, renderIndicator: $.GT.renderSmallNeedle, mechanics: $.GT.clockGaugeMechanics,
+        { registers: [0], movementStart : 90, movementRange: 360, modulo: 10000, renderBase: $.GT.renderAltimeterFace, renderIndicator: $.GT.renderSmallNeedle, mechanics: $.GT.clockGaugeMechanics,
           labels: [ 
             { class: 'label large', caption: 'ALT', position: {x:200, y:155} },
             { class: 'label small', caption: '1000 FEET', position: {x:200, y:130} },
@@ -648,7 +656,7 @@
             { class: 'hidden', offset: 150, scales: [ { divisions: 10, extent:-25, label: { formatFunction: function(v) { return v/1000; }, skip: [2000, 3000] } }, { divisions: 5, extent: -20 } ] } ],
         },
         {
-          registers: [0], startAngle : 90, degreeRange: 360, modulo: 1000, mechanics: $.GT.clockGaugeMechanics,
+          registers: [0], movementStart : 90, movementRange: 360, modulo: 1000, mechanics: $.GT.clockGaugeMechanics,
         } ], 
     }, options));
   }
@@ -659,7 +667,7 @@
       registers: [ 
         { maxValue : 2, minValue : -2,   setFuncName: 'setVario', getFuncName: 'getVario' } ],
       gauges : [ 
-        { registers: [0], startAngle: 180, degreeRange: 360, renderBase: $.GT.renderVarioFace, renderIndicator: $.GT.renderNeedle, mechanics: $.GT.radialGaugeMechanics,
+        { registers: [0], movementStart: 180, movementRange: 360, renderBase: $.GT.renderVarioFace, renderIndicator: $.GT.renderNeedle, mechanics: $.GT.radialGaugeMechanics,
           labels: [ 
             { class: 'label', caption: 'VERTICAL SPEED', position: {x:200, y:165} },
             { class: 'label', caption: '1000 FEET PER MIN', position: {x:200, y:235} }],
