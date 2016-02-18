@@ -8,8 +8,8 @@ g.instrument-box {
 }  
   
 path.instrument-box {
-  fill: #110F0F;
-  stroke: #FFFFFF;
+  fill: #110f0f;
+  stroke: #ffffff;
   stroke-width: 0.5;
   stroke-miterlimit: 10;
 }
@@ -59,7 +59,7 @@ text.label {
   font-size: 14;
   fill: #ffffff;
   text-anchor: middle;
-  dominant-baseline: middle;
+  dominant-baseline: central;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -86,6 +86,10 @@ text.label.left {
   text-anchor: start;
 }
 
+text.scale-label {
+  font-size: 20;
+}
+
 .scale {
   stroke: #ffffff;
   stroke-linecap: round;
@@ -95,10 +99,6 @@ text.label.left {
 .scale-glyph {
   stroke: none;
   fill: #ffffff;
-}
-
-.scale-label {
-  font-size: 20;
 }
 
 .scale-level-0 {

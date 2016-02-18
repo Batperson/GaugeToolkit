@@ -222,6 +222,11 @@
     
     // Insert SVG graphic into the DOM
     placeholder.append(div);
+    
+    // Offset text if IE, because dominant-baseline is not supported
+    var userAgent = window.navigator.userAgent;
+    if(userAgent.indexOf('Edge') > 0 || userAgent.indexOf('MSIE') > 0 || userAgent.indexOf('Trident') > 0)
+      placeholder.find('svg text').attr('dy', '0.8ex');
 
     return instrumentObject;
   }
