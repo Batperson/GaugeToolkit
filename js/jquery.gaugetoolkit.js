@@ -18,13 +18,13 @@
         register = settings.registers[i] = $.extend({
           setFuncName      : 'setValue',
           getFuncName      : 'getValue',
-          value            : 0, 
           minValue         : 0, 
           maxValue         : 100,
           inputConversion  : function(val) { return val; },
           outputConversion : function(val) { return val; }
         }, register);
         
+        if(typeof register.value === 'undefined') register.value = register.minValue;
         register.parent      = settings;
         register.initialized = false;
       });
@@ -217,7 +217,7 @@
     
     // Set initial register value
     registers.forEach(function(register) {
-      register.setValue(register.minValue);
+      register.setValue(register.value);
     });
     
     // Insert SVG graphic into the DOM
@@ -232,11 +232,11 @@
       var defs = elem('defs', null, svg);
       
       var filter = elem('filter', { id: 'GaugeShadow', filterUnits: 'objectBoundingBox' }, defs);
-      var fgb    = elem('feGaussianBlur', { stdDeviation: 5, result: 'blur', in: 'SourceAlpha' }, filter);
-      var fo     = elem('feOffset', { dx: 0, dy: 0, result: 'offsetBlurredAlpha', in: 'blur' }, filter);
+      var fgb    = elem('feGaussianBlur', { stdDeviation: 5, result: 'blur', 'in': 'SourceAlpha' }, filter);
+      var fo     = elem('feOffset', { dx: 0, dy: 0, result: 'offsetBlurredAlpha', 'in': 'blur' }, filter);
       var fm     = elem('feMerge', null, filter);
-      var fmn1   = elem('feMergeNode', { in: 'offsetBlurredAlpha' }, fm);
-      var fmn2   = elem('feMergeNode', { in: 'SourceGraphic' }, fm);
+      var fmn1   = elem('feMergeNode', { 'in': 'offsetBlurredAlpha' }, fm);
+      var fmn2   = elem('feMergeNode', { 'in': 'SourceGraphic' }, fm);
       
       return svg;
     },
@@ -401,6 +401,64 @@
       
       elem('polygon', { points: '327,200 333,194 333,206', class: 'scale-glyph' }, container);
     },
+    renderHorizonIndicator : function(container) {
+      var grad = elem('linearGradient', { id: 'attitudeBackgroundFill', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 350, x2: 200, y2: 50 }, container);
+      elem('stop', { offset: 0.4999 }, grad);
+      elem('stop', { offset: 0.5001 }, grad);
+      
+      var grad2 = elem('linearGradient', { id: 'attitudeBackgroundFillSmooth', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 276, x2: 200, y2: 124 }, container);
+      elem('stop', { offset: 0 }, grad2);
+      elem('stop', { offset: 0.4999 }, grad2);
+      elem('stop', { offset: 0.5001 }, grad2);
+      elem('stop', { offset: 1 }, grad2);
+      
+      var g = elem('g', { id: this.indicatorId + '-roll' }, container);
+      elem('circle', {class: 'attitude-roll-indicator', cx: 200, cy: 200, r: 150 }, g);
+      
+      var g2 = elem('g', { id: this.indicatorId + '-pitch' }, g);
+      elem('path', { class: 'attitude-pitch-indicator', d: 'M301.333,200.333c0,41.936-33.963,75.938-75.885,76c-0.038,0-50.076,0-50.114,0c-41.974,0-76-34.026-76-76s34.026-76,76-76c0.027,0,50.056,0,50.083,0C267.352,124.377,301.333,158.387,301.333,200.333z' }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 99.667,  y1: 200.457, x2: 301.667, y2: 200.457 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 187.979, y1: 187.374, x2: 212.979, y2: 187.374 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 188.167, y1: 213.499, x2: 213.167, y2: 213.499 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 188.026, y1: 241.42,  x2: 213.026, y2: 241.42 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 188.167, y1: 159.374, x2: 213.167, y2: 159.374 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 180.042, y1: 173.405, x2: 220.042, y2: 173.405 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 180.042, y1: 227.499, x2: 220.042, y2: 227.499 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 170.042, y1: 255.332, x2: 230.042, y2: 255.332 }, g2);
+      elem('line', { class: 'attitude-marking-scale round', x1: 170.042, y1: 145.333, x2: 230.042, y2: 145.333 }, g2);
+      elem('text', { class: 'label small', x: 165, y: 173 }, g2, '10');
+      elem('text', { class: 'label small', x: 235, y: 173 }, g2, '10');
+      elem('text', { class: 'label small', x: 165, y: 227 }, g2, '10');
+      elem('text', { class: 'label small', x: 235, y: 227 }, g2, '10');
+      elem('text', { class: 'label small', x: 155, y: 146 }, g2, '20');
+      elem('text', { class: 'label small', x: 245, y: 146 }, g2, '20');
+      elem('text', { class: 'label small', x: 155, y: 256 }, g2, '20');
+      elem('text', { class: 'label small', x: 245, y: 256 }, g2, '20');
+      
+      elem('path', { class: 'attitude-roll-indicator', d: 'M200.667,50.4C117.953,50.4,50.9,117.453,50.9,200.167s67.053,149.767,149.767,149.767s149.767-67.053,149.767-149.767S283.38,50.4,200.667,50.4z M200.667,300.5c-55.413,0-100.334-44.921-100.334-100.334c0-55.412,44.921-100.333,100.334-100.333C256.079,99.833,301,144.753,301,200.166C301,255.579,256.079,300.5,200.667,300.5z' }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 50.667,  y1:200.333,  x2:100.333,  y2:200.333 }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 300.749, y1: 200.333, x2: 350.433, y2: 200.333 }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 78.415,  y1: 131.582, x2: 112.082, y2: 151.915 }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 288.751, y1: 151.915, x2: 323.585, y2: 131.582 }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 149.418, y1: 113.75,  x2: 129.418, y2: 79.25 }, g);
+      elem('line', { class: 'attitude-marking-scale', x1: 252.084, y1: 113.75,  x2: 272.751, y2: 79.25 }, g);
+      elem('polygon', { class: 'attitude-marking-scale', points: '185.918,60.085 215.251,60.085 200.585,98.918' }, g);
+      elem('polygon', { class: 'attitude-marking-scale', points: '119.084,117.417 112.082,124.251 126.584,131.582' }, g);
+      elem('polygon', { class: 'attitude-marking-scale', points: '274.084,131.582 281.251,117.417 288.751,124.5' }, g);
+    },
+    renderHorizonTop : function(container) {
+      elem('line', { class: 'attitude-marking-wings', x1: 130, y1:200, x2:176, y2:200 }, container);
+      elem('line', { class: 'attitude-marking-wings', x1: 225, y1:200, x2:271, y2:200 }, container);
+      elem('line', { class: 'attitude-marking-wings', x1: 200, y1:200, x2:200, y2:200 }, container);
+      elem('line', { class: 'attitude-marking-wings', x1: 200, y1:103, x2:190, y2:130 }, container);
+      elem('line', { class: 'attitude-marking-wings', x1: 190, y1:130, x2:210, y2:130 }, container);
+      elem('line', { class: 'attitude-marking-wings', x1: 210, y1:130, x2:200, y2:103 }, container);
+      
+      elem('path', { class: 'attitude-bottom', d: 'M82.663,298.167c28.157,33.81,70.564,55.333,118.004,55.333s89.847-21.524,118.004-55.333H82.663z' }, container);
+      elem('line', { class: 'attitude-marking-scale', x1: 200, y1: 298, x2: 200, y2: 329 }, container);
+      elem('line', { class: 'attitude-marking-scale', x1: 254, y1: 298, x2: 254, y2: 308 }, container);
+      elem('line', { class: 'attitude-marking-scale', x1: 146, y1: 298, x2: 146, y2: 308 }, container);
+    },
     renderLabel : function(container) {
       elem('text', { x: this.position.x, y: this.position.y, class: this.class, 'font-family': this.font, 'font-size': this.fontsize, fill: this.color, stroke: this.color, 'stroke-width': this.strokewidth, 'stroke-miterlimit': this.strokemiterlimit  }, container, this.caption);
     },
@@ -541,6 +599,22 @@
         });
       }
     },
+    gyroHorizonMechanics : function(settings, container) {
+      var rollIndicator  = container.querySelector('#' + settings.indicatorId + '-roll');
+      var pitchIndicator = container.querySelector('#' + settings.indicatorId + '-pitch');
+      var pitchReg       = settings.registers[0];
+      var rollReg        = settings.registers[1];
+      var pitchF         = 2.7;
+      
+      pitchReg.addListener(function(val) {
+        if(val < -32) val = -32; else if(val > 32) val = 32;
+        pitchIndicator.setAttribute('transform', 'translate(0 ' + (val * pitchF) + ')');
+      });
+      
+      rollReg.addListener(function(val) {
+        rollIndicator.setAttribute('transform', 'rotate(' + val + ' 200 200)');
+      });
+    },
     noMechanics : function(settings, container) {
       
     },
@@ -680,6 +754,20 @@
     obj.setVario = function(v) { if(v < -1.9) { v = -1.9 } else if(v > 1.9) { v = 1.9 } f(v); };
     
     return obj;
+  }
+  
+  $.attitude = function(placeholder, options) {
+    return $.instrument(placeholder, $.extend(true, {
+      class: 'attitude',
+      registers: [
+        { minValue: -90,  maxValue:  90, value: options.pitch || 0, setFuncName: 'setPitch', getFuncName: 'getPitch', inputConversion: function(val) { val = val % 180; if(val < -90) val = 180 + val; else if(val > 90) val = -180 + val; return val; } },
+        { minValue: -180, maxValue: 180, value: options.roll  || 0, setFuncName: 'setRoll', getFuncName: 'getRoll', inputConversion: function(val) { val = val % 360; if(val < -180) val = 360 + val; else if(val > 180) val = -360 + val; return val;  } } ],
+      gauges: [
+        {
+          registers: [0,1], renderIndicator: $.GT.renderHorizonIndicator, renderTop: $.GT.renderHorizonTop, mechanics: $.GT.gyroHorizonMechanics
+        }
+      ]
+    }, options));
   }
 
   $.instrument = function(placeholder, options){

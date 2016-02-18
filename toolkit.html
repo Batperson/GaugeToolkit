@@ -9,11 +9,9 @@ Published under GPLv3 License.
 <head>
     <meta charset="utf-8">
     <!-- Syntax coloration -->
-    <link rel="stylesheet" type="text/css" href="_examples_data/prism/prism.css" />
+    <link rel="stylesheet" type="text/css" href="_examples_res/prism.css" />
     <!-- This page style -->
-    <link rel="stylesheet" type="text/css" href="_examples_data/style.css" />
-    <!-- Flight Indicators library styles -->
-    <link rel="stylesheet" type="text/css" href="css/flightindicators.css" />
+    <link rel="stylesheet" type="text/css" href="_examples_res/style.css" />
     <link rel="stylesheet" type="text/css" href="css/gaugetoolkit.css" />
     <title>jQuery Flight Gauge Toolkit</title>
 </head>
@@ -26,6 +24,7 @@ Published under GPLv3 License.
         
         <div>
             <span id="airspeed"></span>     
+            <span id="attitude"></span>
             <span id="altimeter"></span>     
         </div>
         <div>
@@ -39,13 +38,9 @@ Published under GPLv3 License.
 
 
 
-<!-- Importing jQuery library -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-
-<!-- Importing the FlightIndicators library -->
+<script src="_examples_res/prism.js"></script>
 <script src="js/jquery.gaugetoolkit.js"></script>
-
-<!-- Let start our scripts -->
 <script type="text/javascript">
 
 var generic = $.instrument('#generic', { 
@@ -58,11 +53,12 @@ var generic = $.instrument('#generic', {
         { fromValue:-100, toValue:-20,  color:'#ff0000' }, 
         { fromValue:-20,  toValue:00,   color:'#ffff00' }, 
         { fromValue:00,   toValue:100,  color:'#00ff00' }, 
-        { offset:133.1, class: 'hidden', scales: [ { width:2, divisions: 5, label: { } }, { width : 1, divisions : 10, extent:-10 } ] } ],
+        { offset:133.1, class: 'hidden', scales: [ { offset: -2, divisions: 5, label: { } }, { width : 1, divisions : 5, extent:-10 } ] } ],
     } ], 
 });
 var airspeed     = $.airspeed('#airspeed', { size: 200 }); 
 var altimeter    = $.altimeter('#altimeter', { size: 200 });
+var attitude     = $.attitude('#attitude', { size: 200 });
 var variometer   = $.variometer('#variometer', { size: 200 });
 var heading      = $.heading('#heading', { size: 200, beacon1Visible: true, beacon2Visible: true });
 
@@ -77,6 +73,8 @@ setInterval(function() {
     heading.setHeading(increment/2);
     heading.setBeacon1(increment);
     heading.setBeacon2(-increment);
+    attitude.setPitch(20 * Math.sin(increment/10));
+    attitude.setRoll(30 * Math.sin(increment/30));
     
     increment++;
 }, 50);
