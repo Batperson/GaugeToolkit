@@ -146,6 +146,7 @@
     
     // Initialise SVG
     var svg = settings.renderSvg();
+    svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     svg.setAttribute('class', settings.class);
     svg.setAttribute('width', '100%');
     svg.setAttribute('height', '100%');
@@ -172,9 +173,7 @@
         if(range.toValue === undefined) range.toValue = gauge.registers[0].maxValue;
       });
         
-      var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.setAttribute("class", gauge.classname);
-      
+      var g = elem('g', { class: gauge.classname }, svg);
       if(gauge.visible == false)
         g.setAttribute('display', 'none');
       if(gauge.renderBase)
@@ -203,8 +202,6 @@
         g.setAttribute('transform', transform.trim());
       
       gauge.mechanics(gauge, g);
-      
-      svg.appendChild(g);
     });
     
     if(settings.renderTop)
@@ -221,6 +218,7 @@
     });
     
     // Insert SVG graphic into the DOM
+    placeholder.empty();
     placeholder.append(div);
     
     // Offset text if IE, because dominant-baseline is not supported
@@ -236,7 +234,7 @@
       var svg = elem('svg');
       var defs = elem('defs', null, svg);
       
-      var filter = elem('filter', { id: 'GaugeShadow', filterUnits: 'objectBoundingBox' }, defs);
+      var filter = elem('filter', { id: 'gauge-shadow', filterUnits: 'objectBoundingBox' }, defs);
       var fgb    = elem('feGaussianBlur', { stdDeviation: 5, result: 'blur', 'in': 'SourceAlpha' }, filter);
       var fo     = elem('feOffset', { dx: 0, dy: 0, result: 'offsetBlurredAlpha', 'in': 'blur' }, filter);
       var fm     = elem('feMerge', null, filter);
@@ -407,11 +405,13 @@
       elem('polygon', { points: '327,200 333,194 333,206', class: 'scale-glyph' }, container);
     },
     renderHorizonIndicator : function(container) {
-      var grad = elem('linearGradient', { id: 'attitudeBackgroundFill', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 350, x2: 200, y2: 50 }, container);
+      var defs = $(container.ownerSVGElement).find('defs')[0];
+      
+      var grad = elem('linearGradient', { id: 'attitudeBackgroundFill', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 350, x2: 200, y2: 50 }, defs);
       elem('stop', { offset: 0.4999 }, grad);
       elem('stop', { offset: 0.5001 }, grad);
       
-      var grad2 = elem('linearGradient', { id: 'attitudeBackgroundFillSmooth', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 276, x2: 200, y2: 124 }, container);
+      var grad2 = elem('linearGradient', { id: 'attitudeBackgroundFillSmooth', gradientUnits: 'userSpaceOnUse', x1: 200, y1: 276, x2: 200, y2: 124 }, defs);
       elem('stop', { offset: 0 }, grad2);
       elem('stop', { offset: 0.4999 }, grad2);
       elem('stop', { offset: 0.5001 }, grad2);
@@ -464,6 +464,88 @@
       elem('line', { class: 'attitude-marking-scale', x1: 254, y1: 298, x2: 254, y2: 308 }, container);
       elem('line', { class: 'attitude-marking-scale', x1: 146, y1: 298, x2: 146, y2: 308 }, container);
     },
+    renderSlipSkidBase : function(container) {
+      var defs   = $(container.ownerSVGElement).find('defs')[0];
+      var filter = elem('filter', { 'color-interpolation-filters': 'sRGB', id: 'slip-skid-baseplate-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 12.323861 }, filter);
+      
+      filter     = elem('filter', { x: -0.025320208, y: -0.4602949, width: 1.0506403, height: 1.9205898, 'color-interpolation-filters': 'sRGB', id: 'slip-skid-glass-background-inside-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 2.5395566}, filter);
+      
+      var g = elem('g', { class: 'slip-skid-base', transform: 'translate(-78,10), scale(0.64)' }, container);
+      elem('path', { class: 'slip-skid-glass-background', d: 'm 589.56061,345.52822 c 6.00401,3.72566 -12.18555,52.58809 -16.16244,60.14358 l -137.75312,32.10149 -131.52389,-28.06088 -15.27484,-62.04133 300.71429,-2.14286 z' }, g);
+      elem('path', { class: 'slip-skid-glass-background-inside', d: 'm 558.84631,370.52822 c -47.33809,11.3318 -95.59887,14.35943 -144.50945,11.53893' }, g);
+    },
+    renderSlipSkidIndicator : function(container) {
+      var defs   = $(container.ownerSVGElement).find('defs')[0];
+      var filter = elem('filter', { x: -0.15478399, y: -0.095661767, width: 1.309568, height: 1.1913235, 'color-interpolation-filters': 'sRGB', id: 'slip-skid-ball-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 2.6718665 }, filter);
+      
+      var lg     = elem('linearGradient', { id: 'slip-skid-ball-lineargradient' }, defs);
+      elem('stop', { offset: 0 }, lg);
+      elem('stop', { offset: 1 }, lg);
+      
+      var rg     = elem('radialGradient', { id: 'slip-skid-ball-radialgradient', cx: 436.2619, cy: 383.55603, r: 21.234371, fx: 436.2619, fy: 383.55603, gradientUnits: 'userSpaceOnUse', gradientTransform: 'matrix(0.99962961,0.03151084,-0.03165606,1.3463234,12.30346,-151.54305)' }, defs);
+      rg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#slip-skid-ball-lineargradient');
+      
+      var g      = elem('g', { id: this.indicatorId }, container);
+      g          = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, g);
+      elem('path', { class: 'slip-skid-ball-layer1', transform: 'matrix(1.0344828,0,0,0.89344242,-15.393402,42.833118)', d: 'm 462.49999,391.78574 a 20.714285,33.516418 0 1 1 -41.42857,0 20.714285,33.516418 0 1 1 41.42857,0 z' }, g);
+      elem('path', { class: 'slip-skid-ball-layer2', transform: 'matrix(1.0344828,0,0,0.89344242,-21.030537,41.561674)', d: 'm 462.49999,391.78574 a 20.714285,33.516418 0 1 1 -41.42857,0 20.714285,33.516418 0 1 1 41.42857,0 z' }, g);
+    },
+    renderSlipSkidTop : function(container) {
+      var defs   = $(container.ownerSVGElement).find('defs')[0];
+      var filter = elem('filter', { x: -0.012963847, y: -0.21167447, width: 1.0259277, height: 1.4233489, 'color-interpolation-filters': 'sRGB', id: 'slip-skid-glass-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 1.3586542 }, filter);
+      
+      filter = elem('filter', { x: 0.037216581, y: -1.1012783, width: 1.0744332, height: 3.2025566, 'color-interpolation-filters': 'sRGB', id: 'slip-skid-glass-horizontal-marks-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 0.42103338 }, filter);
+      
+      filter = elem('filter', { x: -1.5192107, y: -0.16643283, width: 4.0384216, height: 1.3328657, 'color-interpolation-filters': 'sRGB', id: 'slip-skid-glass-left-shadow-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 2.4271454 }, filter);
+      
+      var g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, container);
+      
+      elem('path', { class: 'instrument-face slip-skid', d: 'm 435.64988,123.75143 c -96.3635,0 -174.46875,78.1365 -174.46875,174.5 0,96.3635 78.10525,174.46875 174.46875,174.46875 96.3635,0 174.46875,-78.10525 174.46875,-174.46875 0,-96.3635 -78.10525,-174.5 -174.46875,-174.5 z m -127.75,230.28125 c 2.93053,-0.0399 6.74284,0.86595 10.84375,1.78125 38.73558,8.64556 91.06394,11.90625 116.90625,11.90625 25.84231,0 78.17067,-3.26069 116.90625,-11.90625 9.37351,-2.09211 17.16128,-4.12165 16.6875,5.0625 -0.8315,16.11858 1.45844,35.07601 -14.15625,40.40625 -36.57226,12.48432 -98.952,15.65625 -119.4375,15.65625 -20.4855,0 -82.86524,-3.17193 -119.4375,-15.65625 -15.61469,-5.33024 -13.32475,-24.28767 -14.15625,-40.40625 -0.2665,-5.16608 2.07592,-6.79242 5.84375,-6.84375 z' }, g);
+      elem('path', { class: 'slip-skid-base-blur', transform: 'matrix(0.62780867,0,0,0.62780867,164.2205,91.859596)', d: 'm 678.82249,328.72943 a 246.47722,246.47722 0 1 1 -492.95443,0 246.47722,246.47722 0 1 1 492.95443,0 z' }, g);
+      
+      elem('path', { class: 'slip-skid-glass-reflection', d: 'M 565.45523,362.63603 C 481.61257,381.11769 397.76991,381.69222 313.92725,361.1208' }, g);
+      elem('path', { class: 'slip-skid-glass-reflection', d: 'm 565.45523,367.43425 c -83.84266,18.48166 -167.68532,19.05619 -251.52798,-1.51523' }, g);
+      elem('path', { class: 'slip-skid-glass-left-shadow', d: 'm 324.17807,362.166 c -2.80164,11.19048 -4.52044,23.80952 -3.57142,35' }, g);
+      
+      elem('path', { class: 'slip-skid-glass-horizontal-marks', d: 'm 422.49578,368.30507 0.89439,0.70614 c 8.83169,0.30103 17.41075,0.26525 25.80997,-0.0103 l 0.44698,-0.38853' }, g);
+      elem('path', { class: 'slip-skid-glass-horizontal-marks', d: 'm 423.88521,415.22423 c 8.42293,0.54697 16.54539,0.493 24.44979,0.003' }, g);
+      elem('path', { class: 'slip-skid-glass-vertical-marks', d: 'm 458.52052,416.17411 c 1.89517,-16.28871 2.14229,-32.57742 0,-48.86613 m -45.73981,48.86613 c -1.89517,-16.28871 -2.14229,-32.57742 0,-48.86613' }, g);
+    },
+    
+    renderTCBase : function(container) {
+      var g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, container);
+      elem('path', { class: 'instrument-face turn-coordinator-face', d: 'm 594.24456,298.23878 c 0,87.58902 -71.00493,158.59395 -158.59394,158.59395 -87.58902,0 -158.59395,-71.00493 -158.59395,-158.59395 0,-87.58902 71.00493,-158.59395 158.59395,-158.59395 87.58901,0 158.59394,71.00493 158.59394,158.59395 z m 70.71068,0 c 0,126.64145 -102.66318,229.30463 -229.30462,229.30463 -126.64145,0 -229.30463,-102.66318 -229.30463,-229.30463 0,-126.64145 102.66318,-229.304622 229.30463,-229.304622 126.64144,0 229.30462,102.663172 229.30462,229.304622 z' }, g);
+      elem('text', { class: 'label', x: 200, y: 70 }, container, 'D.C.'); 
+      elem('text', { class: 'label', x: 200, y: 85 }, container, 'ELEC.'); 
+      elem('text', { class: 'label', x: 200, y: 170 }, container, 'TURN COORDINATOR'); 
+      elem('text', { class: 'label', x: 200, y: 290 }, container, '2 MIN.'); 
+      elem('text', { class: 'label small', x: 200, y: 318 }, container, 'NO PITCH'); 
+      elem('text', { class: 'label small', x: 200, y: 333 }, container, 'INFORMATION'); 
+      
+      elem('rect', { class: 'scale-glyph', x: 248.20827, y: 311.11826, width: 29.78681, height: 14.517226, rx: 2.1428571, ry: 2.1428571 }, g);
+      elem('rect', { class: 'scale-glyph', x: -622.44928, y: 311.11826, width: 29.78681, height: 14.517226, rx: 2.1428571, ry: 2.1428571, transform: 'scale(-1,1)' }, g);
+      elem('rect', { class: 'scale-glyph', x: 118.46992, y: 437.55161, width: 29.78681, height: 14.517226, rx: 2.1428571, ry: 2.1428571, transform: 'matrix(0.93872509,-0.34466681,0.34466681,0.93872509,0,0)' }, g);
+      elem('rect', { class: 'scale-glyph', x: -698.83789, y: 137.46478, width: 29.78681, height: 14.517226, rx: 2.1428571, ry: 2.1428571, transform: 'matrix(-0.93872509,-0.34466681,-0.34466681,0.93872509,0,0)' }, g);
+      elem('text', { class: 'label large', x: 295.46774, y: 425.35342 }, g, 'L'); 
+      elem('text', { class: 'label large', x: 575.61615, y: 425.35342 }, g, 'R'); 
+    },
+    renderTCIndicator : function(container) {
+      var defs   = $(container.ownerSVGElement).find('defs')[0];
+      var filter = elem('filter', { 'color-interpolation-filters': 'sRGB', id: 'turn-coordinator-aircraft-shadow-blur' }, defs);
+      elem('feGaussianBlur', { stdDeviation: 1.560427 }, filter);
+      
+      var g = elem('g', { id: this.indicatorId,  }, container);
+      g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, g);
+      
+      elem('path', { class: 'turn-coordinator-aircraft', d: 'm 435.64988,289.47018 c -12.33394,0 -22.41326,9.69394 -23.03125,21.875 l -121.9375,-0.22694 c -4.43702,0.0318 -5.34776,6.2322 -0.5,7.0625 l 126.375,7.25819 c 4.14867,6.10563 11.15189,10.125 19.09375,10.125 7.92634,0 14.91358,-4.00188 19.0625,-10.09375 l 126.9375,-7.28944 c 4.84776,-0.8303 3.93702,-7.0307 -0.5,-7.0625 l -122.46875,0.25819 c -0.6019,-12.19506 -10.68685,-21.90625 -23.03125,-21.90625 z' }, g);
+      elem('path', { class: 'turn-coordinator-aircraft', d: 'm 382.64058,299.50149 c 4.38251,0.0518 102.16734,0.0518 106.54985,0 4.38251,-0.0518 5.82754,-6.6971 -0.25253,-7.17567 l -44.44671,-2.12492 c -3.68642,-0.66946 -4.02856,-2.28053 -4.29315,-4.3671 l -0.50508,-25.22318 c 0,-3.88798 -7.42864,-3.96105 -7.42864,0 l -0.50508,25.22318 c -0.26459,2.08657 -0.60673,3.69764 -4.29315,4.3671 l -44.57298,2.12492 c -6.08007,0.47857 -4.63504,7.12387 -0.25253,7.17567 z' }, g);
+    },
     renderLabel : function(container) {
       elem('text', { x: this.position.x, y: this.position.y, class: this.class, 'font-family': this.font, 'font-size': this.fontsize, fill: this.color, stroke: this.color, 'stroke-width': this.strokewidth, 'stroke-miterlimit': this.strokemiterlimit  }, container, this.caption);
     },
@@ -513,6 +595,7 @@
           scale.rp1.setAttribute('d', getD(range.offset + scale.offset, angleStart, angleEnd));
           scale.rp2.setAttribute('d', getD(range.offset + scale.extent, angleStart, angleEnd));
           if(scale.label) {
+        	scale.label.curinterval = 0;
             scale.label.rp = document.createElementNS("http://www.w3.org/2000/svg", "path");
             scale.label.rp.setAttribute('d', getD(range.offset + scale.label.offset, angleStart, angleEnd));
           }
@@ -534,6 +617,7 @@
           var scale  = this.scales[t]; 
           var pt1    = scale.rp1.getPointAtLength((scale.rp1.getTotalLength() / tcount) * i);
           var pt2    = scale.rp2.getPointAtLength((scale.rp2.getTotalLength() / tcount) * i);
+          var item   = scale;
           
           var _skipFunc = function(v) {
             switch(typeof v) {
@@ -544,6 +628,7 @@
                 if(v.modulo && val % v.modulo == 0) return false;
                 if(v.below != undefined && val < v.below) return false;
                 if(v.above != undefined && val > v.above) return false;
+                if(v.nth != undefined && item.curinterval % v.nth != 0) return false;
                 return true;
               default:
                 return true;
@@ -565,6 +650,7 @@
             
             var label = scale.label;
             if(label) {
+              item = label;
               if(!label.skip || label.skip.every(_skipFunc)) {
                 label.parent   = scale;
                 label.caption  = label.formatFunction(val);
@@ -573,8 +659,12 @@
                 if(label.render)
                   label.render(container);
               }
+              
+              label.curinterval++;
             }
           }
+          
+          scale.curinterval++;
         }
       }
     },
@@ -619,6 +709,17 @@
       rollReg.addListener(function(val) {
         rollIndicator.setAttribute('transform', 'rotate(' + val + ' 200 200)');
       });
+    },
+    slipSkidMechanics : function(settings, container) {
+      var indicatorElem = container.querySelector('#' + settings.indicatorId);
+      if(settings.registers && settings.registers.length && indicatorElem) {
+        var register        = settings.registers[0];
+      
+        register.addListener(function(val) {
+          var degrees = val * 1.5;
+          indicatorElem.setAttribute('transform', 'rotate(' + degrees + ' 200 0)');
+        });
+      }
     },
     noMechanics : function(settings, container) {
       
@@ -702,9 +803,9 @@
         movementStart: 90,
         labels: [ { caption: 'AIR SPEED', position: {x:200, y:160} }, { caption: 'KNOTS', position: {x:200, y:240} } ],
         ranges: [ 
-          { offset: 150, extent: -10, fromValue:30, toValue:100,  color:'#007511' }, 
-          { offset: 150, extent: -10, fromValue:100,  toValue:140,   color:'#f9ff00' }, 
-          { offset: 150, extent: -10, fromValue:140,   toValue:160,  color:'#ff0000' }, 
+          { offset: 150, extent: -10, fromValue:30, toValue:100, class: 'airspeed-range-safe' }, 
+          { offset: 150, extent: -10, fromValue:100,  toValue:140, class: 'airspeed-range-warn' }, 
+          { offset: 150, extent: -10, fromValue:140,   toValue:160, class: 'airspeed-range-danger' }, 
           { offset: 150, class: 'hidden', fromValue:0, toValue:30, scales: [ { class: 'scale scale-level-2', divisions: 12, extent:-10, skip: [0, 30, { modulo: 5 }] } ] },
           { offset: 150, class: 'hidden', scales: [ { divisions: 16, extent:-20, label: { skip:[{ notmodulo:20}] } }, { divisions: 2, extent:-16 }, /*{ divisions: 2, extent: -10 }*/ ] } ]
         } ], 
@@ -771,6 +872,20 @@
         {
           registers: [0,1], renderIndicator: $.GT.renderHorizonIndicator, renderTop: $.GT.renderHorizonTop, mechanics: $.GT.gyroHorizonMechanics
         }
+      ]
+    }, options));
+  }
+  
+  $.turn_coordinator = function(placeholder, options) {
+    return $.instrument(placeholder, $.extend(true, {
+      class: 'turn-coordinator',
+      registers: [
+        { minValue: -10, maxValue: 10, value: 0, setFuncName: 'setTurn', getFuncName: 'getTurn' },
+        { minValue: -10, maxValue: 10, value: 0, setFuncName: 'setSlipSkid', getFuncName: 'getSlipSkid' }
+      ],
+      gauges: [
+        { registers: [1], renderBase: $.GT.renderSlipSkidBase, renderIndicator: $.GT.renderSlipSkidIndicator, renderTop: $.GT.renderSlipSkidTop, mechanics: $.GT.slipSkidMechanics },
+        { registers: [0], movementStart: 60, movementRange: 120, renderBase: $.GT.renderTCBase, renderIndicator: $.GT.renderTCIndicator, clockwise: false }
       ]
     }, options));
   }

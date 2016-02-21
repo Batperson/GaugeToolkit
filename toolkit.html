@@ -28,6 +28,7 @@ Published under GPLv3 License.
             <span id="altimeter"></span>     
         </div>
         <div>
+            <span id="turn_coordinator"></span>
             <span id="heading"></span>
             <span id="variometer"></span>   
         </div>
@@ -61,6 +62,7 @@ var altimeter    = $.altimeter('#altimeter', { size: 200 });
 var attitude     = $.attitude('#attitude', { size: 200 });
 var variometer   = $.variometer('#variometer', { size: 200 });
 var heading      = $.heading('#heading', { size: 200, beacon1Visible: true, beacon2Visible: true });
+var turn_coord   = $.turn_coordinator('#turn_coordinator', { size: 200 });
 
 // Update at 20Hz
 var increment = 0;
@@ -75,6 +77,8 @@ setInterval(function() {
     heading.setBeacon2(-increment);
     attitude.setPitch(20 * Math.sin(increment/10));
     attitude.setRoll(30 * Math.sin(increment/30));
+    turn_coord.setTurn(10 * Math.sin(increment/30));
+    turn_coord.setSlipSkid(10 * Math.sin(increment/30));
     
     increment++;
 }, 50);
