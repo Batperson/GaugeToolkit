@@ -34,6 +34,8 @@ Published under GPLv3 License.
         </div>
         <div>
             <span id="generic"></span>     
+            <span id="ammeter"></span>
+            <span id="voltmeter"></span>
         </div>
     </div>
 
@@ -63,6 +65,9 @@ var attitude     = $.attitude('#attitude', { size: 200 });
 var variometer   = $.variometer('#variometer', { size: 200 });
 var heading      = $.heading('#heading', { size: 200, beacon1Visible: true, beacon2Visible: true });
 var turn_coord   = $.turn_coordinator('#turn_coordinator', { size: 200 });
+//var turn_coord   = $.turn_slip_indicator('#turn_coordinator', { size: 200 });
+var ammeter      = $.ammeter('#ammeter', { size: 200 });
+var voltmeter    = $.voltmeter('#voltmeter', { size: 200, maxVolts: 13, criticalVolts: 11.1, warnVolts: 11.6 });
 
 // Update at 20Hz
 var increment = 0;
@@ -79,6 +84,9 @@ setInterval(function() {
     attitude.setRoll(30 * Math.sin(increment/30));
     turn_coord.setTurn(10 * Math.sin(increment/30));
     turn_coord.setSlipSkid(10 * Math.sin(increment/30));
+    ammeter.setAmps(15 + 15 * Math.sin(increment/10));
+    voltmeter.setVolts(11.8 + 0.8 * Math.sin(increment/10));
+
     
     increment++;
 }, 50);

@@ -126,22 +126,22 @@ text.scale-label {
 }
 
 path.range {
-  
+  fill: #ffffff;
 }
 
 .hidden {
   display: none;
 }
 
-path.airspeed-range-safe {
+path.range.safe {
   fill: #007511;
 }
 
-path.airspeed-range-warn {
+path.range.warn {
   fill: #f9ff00;
 }
 
-path.airspeed-range-danger {
+path.range.critical {
   fill: #ff0000;
 }
 
@@ -366,4 +366,17 @@ path.turn-coordinator-aircraft {
   fill: #ffffff;
   stroke: none;
   filter: url(#gauge-shadow);
+}
+
+path.turn-slip-face {
+  fill-rule: evenodd;
+  filter: none;
+}
+
+.ammeter .scale-label {
+  font-size: 18;
+}
+
+.voltmeter .scale-label {
+  font-size: 18;
 }

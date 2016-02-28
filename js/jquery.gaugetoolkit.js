@@ -44,6 +44,7 @@
           scale           : 1,
           offset          : { x:0, y:0 },
           rotate          : 0,
+          hubCentrePoint  : [200, 200],
           ranges          : [],
           labels          : [],
           scales           : [],
@@ -507,7 +508,6 @@
       var g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, container);
       
       elem('path', { class: 'instrument-face slip-skid', d: 'm 435.64988,123.75143 c -96.3635,0 -174.46875,78.1365 -174.46875,174.5 0,96.3635 78.10525,174.46875 174.46875,174.46875 96.3635,0 174.46875,-78.10525 174.46875,-174.46875 0,-96.3635 -78.10525,-174.5 -174.46875,-174.5 z m -127.75,230.28125 c 2.93053,-0.0399 6.74284,0.86595 10.84375,1.78125 38.73558,8.64556 91.06394,11.90625 116.90625,11.90625 25.84231,0 78.17067,-3.26069 116.90625,-11.90625 9.37351,-2.09211 17.16128,-4.12165 16.6875,5.0625 -0.8315,16.11858 1.45844,35.07601 -14.15625,40.40625 -36.57226,12.48432 -98.952,15.65625 -119.4375,15.65625 -20.4855,0 -82.86524,-3.17193 -119.4375,-15.65625 -15.61469,-5.33024 -13.32475,-24.28767 -14.15625,-40.40625 -0.2665,-5.16608 2.07592,-6.79242 5.84375,-6.84375 z' }, g);
-      elem('path', { class: 'slip-skid-base-blur', transform: 'matrix(0.62780867,0,0,0.62780867,164.2205,91.859596)', d: 'm 678.82249,328.72943 a 246.47722,246.47722 0 1 1 -492.95443,0 246.47722,246.47722 0 1 1 492.95443,0 z' }, g);
       
       elem('path', { class: 'slip-skid-glass-reflection', d: 'M 565.45523,362.63603 C 481.61257,381.11769 397.76991,381.69222 313.92725,361.1208' }, g);
       elem('path', { class: 'slip-skid-glass-reflection', d: 'm 565.45523,367.43425 c -83.84266,18.48166 -167.68532,19.05619 -251.52798,-1.51523' }, g);
@@ -517,9 +517,9 @@
       elem('path', { class: 'slip-skid-glass-horizontal-marks', d: 'm 423.88521,415.22423 c 8.42293,0.54697 16.54539,0.493 24.44979,0.003' }, g);
       elem('path', { class: 'slip-skid-glass-vertical-marks', d: 'm 458.52052,416.17411 c 1.89517,-16.28871 2.14229,-32.57742 0,-48.86613 m -45.73981,48.86613 c -1.89517,-16.28871 -2.14229,-32.57742 0,-48.86613' }, g);
     },
-    
     renderTCBase : function(container) {
       var g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, container);
+      elem('path', { class: 'slip-skid-base-blur', transform: 'matrix(0.62780867,0,0,0.62780867,164.2205,91.859596)', d: 'm 678.82249,328.72943 a 246.47722,246.47722 0 1 1 -492.95443,0 246.47722,246.47722 0 1 1 492.95443,0 z' }, g);
       elem('path', { class: 'instrument-face turn-coordinator-face', d: 'm 594.24456,298.23878 c 0,87.58902 -71.00493,158.59395 -158.59394,158.59395 -87.58902,0 -158.59395,-71.00493 -158.59395,-158.59395 0,-87.58902 71.00493,-158.59395 158.59395,-158.59395 87.58901,0 158.59394,71.00493 158.59394,158.59395 z m 70.71068,0 c 0,126.64145 -102.66318,229.30463 -229.30462,229.30463 -126.64145,0 -229.30463,-102.66318 -229.30463,-229.30463 0,-126.64145 102.66318,-229.304622 229.30463,-229.304622 126.64144,0 229.30462,102.663172 229.30462,229.304622 z' }, g);
       elem('text', { class: 'label', x: 200, y: 70 }, container, 'D.C.'); 
       elem('text', { class: 'label', x: 200, y: 85 }, container, 'ELEC.'); 
@@ -543,8 +543,26 @@
       var g = elem('g', { id: this.indicatorId,  }, container);
       g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, g);
       
-      elem('path', { class: 'turn-coordinator-aircraft', d: 'm 435.64988,289.47018 c -12.33394,0 -22.41326,9.69394 -23.03125,21.875 l -121.9375,-0.22694 c -4.43702,0.0318 -5.34776,6.2322 -0.5,7.0625 l 126.375,7.25819 c 4.14867,6.10563 11.15189,10.125 19.09375,10.125 7.92634,0 14.91358,-4.00188 19.0625,-10.09375 l 126.9375,-7.28944 c 4.84776,-0.8303 3.93702,-7.0307 -0.5,-7.0625 l -122.46875,0.25819 c -0.6019,-12.19506 -10.68685,-21.90625 -23.03125,-21.90625 z' }, g);
-      elem('path', { class: 'turn-coordinator-aircraft', d: 'm 382.64058,299.50149 c 4.38251,0.0518 102.16734,0.0518 106.54985,0 4.38251,-0.0518 5.82754,-6.6971 -0.25253,-7.17567 l -44.44671,-2.12492 c -3.68642,-0.66946 -4.02856,-2.28053 -4.29315,-4.3671 l -0.50508,-25.22318 c 0,-3.88798 -7.42864,-3.96105 -7.42864,0 l -0.50508,25.22318 c -0.26459,2.08657 -0.60673,3.69764 -4.29315,4.3671 l -44.57298,2.12492 c -6.08007,0.47857 -4.63504,7.12387 -0.25253,7.17567 z' }, g);
+      elem('path', { class: 'turn-coordinator-aircraft', d: 'm 382.64058,299.50149 c 4.38251,0.0518 102.16734,0.0518 106.54985,0 4.38251,-0.0518 5.82754,-6.6971 -0.25253,-7.17567 l -44.44671,-2.12492 c -3.68642,-0.66946 -4.02856,-2.28053 -4.29315,-4.3671 l -0.50508,-25.22318 c 0,-3.88798 -7.42864,-3.96105 -7.42864,0 l -0.50508,25.22318 c -0.26459,2.08657 -0.60673,3.69764 -4.29315,4.3671 l -44.57298,2.12492 c -6.08007,0.47857 -4.63504,7.12387 -0.25253,7.17567 z m 53.0093,-10.03131 c -12.33394,0 -22.41326,9.69394 -23.03125,21.875 l -121.9375,-0.22694 c -4.43702,0.0318 -5.34776,6.2322 -0.5,7.0625 l 126.375,7.25819 c 4.14867,6.10563 11.15189,10.125 19.09375,10.125 7.92634,0 14.91358,-4.00188 19.0625,-10.09375 l 126.9375,-7.28944 c 4.84776,-0.8303 3.93702,-7.0307 -0.5,-7.0625 l -122.46875,0.25819 c -0.6019,-12.19506 -10.68685,-21.90625 -23.03125,-21.90625 z' }, g);
+    },
+    renderTSBase : function(container) {
+      var g = elem('g', { transform: 'translate(-78,10), scale(0.64)' }, container);
+      elem('path', { class: 'instrument-face turn-slip-face', d: 'm 594.24456,298.23878 c 0,87.58902 -71.00493,158.59395 -158.59394,158.59395 -87.58902,0 -158.59395,-71.00493 -158.59395,-158.59395 0,-87.58902 71.00493,-158.59395 158.59395,-158.59395 87.58901,0 158.59394,71.00493 158.59394,158.59395 z m 70.71068,0 c 0,126.64145 -102.66318,229.30463 -229.30462,229.30463 -126.64145,0 -229.30463,-102.66318 -229.30463,-229.30463 0,-126.64145 102.66318,-229.304622 229.30463,-229.304622 126.64144,0 229.30462,102.663172 229.30462,229.304622 z' }, g);
+      
+      elem('path', { class: 'scale-glyph', d: 'M195.5,98 l9,0 0,-5 5,-5 0,-10 -19,0 0,10 5,5 0,5 z' }, container);
+      elem('path', { class: 'scale-glyph', transform: 'rotate(-18 200 200)', d: 'M195.5,98 l9,0 0,-10 -4.5,-5 -4.5,5 z' }, container);
+      elem('path', { class: 'scale-glyph', transform: 'rotate(18 200 200)',  d: 'M195.5,98 l9,0 0,-10 -4.5,-5 -4.5,5 z' }, container);
+      
+      elem('text', { class: 'label large', x: 150, y: 120 }, container, 'L');       
+      elem('text', { class: 'label large', x: 250, y: 120 }, container, 'R');       
+      elem('text', { class: 'label', x: 200, y: 300 }, container, '2 MIN TURN'); 
+      elem('text', { class: 'label tiny', x: 200, y: 320 }, container, 'D.C. ELEC.'); 
+      
+    },
+    renderTSIndicator : function(container) {
+      var g     = elem('g', { class: 'needle needle-standard', id: this.indicatorId }, container);
+      var poly  = elem('polygon', { class: 'needle', points: '100,196.417 100,203.583 184.334,203.583 184.334,196.417' }, g);
+      var path  = elem('path', { class: 'needle-hub', d: 'M239.042,196.417c-3.563-3.563-8.918,0-13.063,0c-0.787,0-3.148,0-3.148,0h-11.969c-1.51-4.271-5.573-7.337-10.362-7.337s-8.852,3.065-10.362,7.337h-5.804v7.167h5.745c1.464,4.355,5.572,7.496,10.42,7.496s8.956-3.141,10.42-7.496h12.036c0,0,2.314,0,3.085,0c3.874,0,9.458,3.542,13,0C241.124,201.501,241.25,198.625,239.042,196.417z'}, g);
     },
     renderLabel : function(container) {
       elem('text', { x: this.position.x, y: this.position.y, class: this.class, 'font-family': this.font, 'font-size': this.fontsize, fill: this.color, stroke: this.color, 'stroke-width': this.strokewidth, 'stroke-miterlimit': this.strokemiterlimit  }, container, this.caption);
@@ -677,7 +695,7 @@
       
         register.addListener(function(val) {
           var degrees = degreeStart + (val - register.minValue) * settings.degreesPerValue * f;
-          indicatorElem.setAttribute('transform', 'rotate(' + degrees + ' 200 200)');
+          indicatorElem.setAttribute('transform', 'rotate(' + degrees + ' ' + settings.hubCentrePoint[0] + ' ' + settings.hubCentrePoint[1] + ')');
         });
       }
     },
@@ -792,7 +810,7 @@
         renderIndicator: $.GT.renderBeaconTwo
       } ]
     }, options));
-  }
+  };
   
   $.airspeed = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, { 
@@ -803,14 +821,14 @@
         movementStart: 90,
         labels: [ { caption: 'AIR SPEED', position: {x:200, y:160} }, { caption: 'KNOTS', position: {x:200, y:240} } ],
         ranges: [ 
-          { offset: 150, extent: -10, fromValue:30, toValue:100, class: 'airspeed-range-safe' }, 
-          { offset: 150, extent: -10, fromValue:100,  toValue:140, class: 'airspeed-range-warn' }, 
-          { offset: 150, extent: -10, fromValue:140,   toValue:160, class: 'airspeed-range-danger' }, 
+          { offset: 150, extent: -10, fromValue:30, toValue:100, class: 'range safe' }, 
+          { offset: 150, extent: -10, fromValue:100,  toValue:140, class: 'range warn' }, 
+          { offset: 150, extent: -10, fromValue:140,   toValue:160, class: 'range critical' }, 
           { offset: 150, class: 'hidden', fromValue:0, toValue:30, scales: [ { class: 'scale scale-level-2', divisions: 12, extent:-10, skip: [0, 30, { modulo: 5 }] } ] },
           { offset: 150, class: 'hidden', scales: [ { divisions: 16, extent:-20, label: { skip:[{ notmodulo:20}] } }, { divisions: 2, extent:-16 }, /*{ divisions: 2, extent: -10 }*/ ] } ]
         } ], 
     }, options));
-  }
+  };
   
   $.altimeter = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, {
@@ -839,7 +857,7 @@
           registers: [0], movementStart : 90, movementRange: 360, modulo: 1000, mechanics: $.GT.clockGaugeMechanics,
         } ], 
     }, options));
-  }
+  };
   
   $.variometer = function(placeholder, options) {
     var obj = $.instrument(placeholder, $.extend(true, {
@@ -860,7 +878,7 @@
     obj.setVario = function(v) { if(v < -1.9) { v = -1.9 } else if(v > 1.9) { v = 1.9 } f(v); };
     
     return obj;
-  }
+  };
   
   $.attitude = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, {
@@ -874,7 +892,7 @@
         }
       ]
     }, options));
-  }
+  };
   
   $.turn_coordinator = function(placeholder, options) {
     return $.instrument(placeholder, $.extend(true, {
@@ -885,21 +903,68 @@
       ],
       gauges: [
         { registers: [1], renderBase: $.GT.renderSlipSkidBase, renderIndicator: $.GT.renderSlipSkidIndicator, renderTop: $.GT.renderSlipSkidTop, mechanics: $.GT.slipSkidMechanics },
-        { registers: [0], movementStart: 60, movementRange: 120, renderBase: $.GT.renderTCBase, renderIndicator: $.GT.renderTCIndicator, clockwise: false }
+        { registers: [0], movementStart: -60, movementRange: 120, renderBase: $.GT.renderTCBase, renderIndicator: $.GT.renderTCIndicator, hubCentrePoint: [200,210] }
       ]
     }, options));
-  }
+  };
+  
+  $.turn_slip_indicator = function(placeholder, options) {
+    return $.instrument(placeholder, $.extend(true, {
+      class: 'turn-slip-indicator',
+      registers: [
+        { minValue: -10, maxValue: 10, value: 0, setFuncName: 'setTurn', getFuncName: 'getTurn' },
+        { minValue: -10, maxValue: 10, value: 0, setFuncName: 'setSlipSkid', getFuncName: 'getSlipSkid' }
+      ],
+      gauges: [
+        { registers: [1], renderBase: $.GT.renderSlipSkidBase, renderIndicator: $.GT.renderSlipSkidIndicator, renderTop: $.GT.renderSlipSkidTop, mechanics: $.GT.slipSkidMechanics },
+        { registers: [0], movementStart: 30, movementRange: 120, renderBase: $.GT.renderTSBase, renderIndicator: $.GT.renderTSIndicator }
+      ]
+    }, options));
+  };
+  
+  $.ammeter = function(placeholder, options) {
+    return $.instrument(placeholder, $.extend(true, {
+      class: 'ammeter',
+      registers: [ { maxValue : options.maxAmps || 30, minValue : 0, getFuncName: 'getAmps', setFuncName: 'setAmps' } ],
+      gauges : [ 
+        { offset: { y:60 }, scale: 1.2, 
+          labels: [ { caption: 'AMPS', position: {x:200, y:160} } ],
+          ranges: [ 
+            { offset:134, scales: [ { offset: -2, divisions: 5, label: { } }, { offset: -2, width : 1, divisions : 2, extent:-10 } ] } ],
+        } ], 
+    }, options));
+  };
+  
+  $.voltmeter = function(placeholder, options) {
+    var minVolts = options.minVolts || 10;
+    var maxVolts = options.maxVolts || 16;
+    var critVolts = options.criticalVolts || 11;
+    var warnVolts = options.warnVolts || 13;
+    return $.instrument(placeholder, $.extend(true, {
+      class: 'voltmeter',
+      registers: [ { maxValue : maxVolts, minValue : minVolts, getFuncName: 'getVolts', setFuncName: 'setVolts' } ],
+      gauges : [ 
+        { offset: { y:60 }, scale: 1.2, 
+          labels: [ { caption: 'VOLTS', position: {x:200, y:160} } ],
+          ranges: [ 
+            { fromValue:minVolts,  toValue:critVolts, class: 'range critical', extent: -8 }, 
+            { fromValue:critVolts, toValue:warnVolts, class: 'range warn', extent: -8 }, 
+            { fromValue:warnVolts, toValue:maxVolts,  class: 'range safe', extent: -8 }, 
+            { offset:134, class: 'hidden', scales: [ { offset: -2, divisions: maxVolts - minVolts, label: { } }, { offset: -2, width : 1, divisions : 2, extent:-10 } ] } ],
+        } ], 
+    }, options));
+  };
 
   $.instrument = function(placeholder, options){
 		var instr = new Instrument($(placeholder), options)
 		return instr;
-	}
+	};
 
 	$.fn.instrument = function(data, options){
 		return this.each(function(){
 			$.instrument(this, options);
 		});
-	}
+	};
   
   var constants = {
     /* SVG canvas width */
