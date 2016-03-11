@@ -806,7 +806,7 @@
         movementStart: 0,
         clockwise: true,
         visible: options.beacon2Visible || false,
-        showFuncName: 'showBeacon1',
+        showFuncName: 'showBeacon2',
         renderIndicator: $.GT.renderBeaconTwo
       } ]
     }, options));
@@ -884,8 +884,8 @@
     return $.instrument(placeholder, $.extend(true, {
       class: 'attitude',
       registers: [
-        { minValue: -90,  maxValue:  90, value: options.pitch || 0, setFuncName: 'setPitch', getFuncName: 'getPitch', inputConversion: function(val) { val = val % 180; if(val < -90) val = 180 + val; else if(val > 90) val = -180 + val; return val; } },
-        { minValue: -180, maxValue: 180, value: options.roll  || 0, setFuncName: 'setRoll', getFuncName: 'getRoll', inputConversion: function(val) { val = val % 360; if(val < -180) val = 360 + val; else if(val > 180) val = -360 + val; return val;  } } ],
+        { minValue: -90,  maxValue:  90, value: options.pitch || 0, setFuncName: 'setPitch', getFuncName: 'getPitch', inputConversion: function(val) { val = -val % 180; if(val < -90) val = 180 + val; else if(val > 90) val = -180 + val; return val; } },
+        { minValue: -180, maxValue: 180, value: options.roll  || 0, setFuncName: 'setRoll', getFuncName: 'getRoll', inputConversion: function(val) { val = -val % 360; if(val < -180) val = 360 + val; else if(val > 180) val = -360 + val; return val;  } } ],
       gauges: [
         {
           registers: [0,1], renderIndicator: $.GT.renderHorizonIndicator, renderTop: $.GT.renderHorizonTop, mechanics: $.GT.gyroHorizonMechanics

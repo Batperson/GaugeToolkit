@@ -82,7 +82,7 @@ setInterval(function() {
     heading.setBeacon2(-increment);
     attitude.setPitch(20 * Math.sin(increment/10));
     attitude.setRoll(30 * Math.sin(increment/30));
-    turn_coord.setTurn(10 * Math.sin(increment/30));
+    turn_coord.setTurn(10 * -Math.sin(increment/30));
     turn_coord.setSlipSkid(10 * Math.sin(increment/30));
     ammeter.setAmps(15 + 15 * Math.sin(increment/10));
     voltmeter.setVolts(11.8 + 0.8 * Math.sin(increment/10));
